@@ -1,30 +1,59 @@
 const express = require('express')
+
 const app = express()
-const server = require('http').Server(app)
-const io = require('socket.io')(server)
 
-let messages = [
-];
+const {Server:HttpServer} = require('http')
+const {Server:Socket} = require('socket.io')
 
+const ContenedorDB = require('./src/contenedores/ContenedorDB')
+const {configMySQL , configSGLite}= require('./src/config')
+
+
+
+
+//instalacion server socket y db
+
+
+const httpServer= new HttpServer(app)
+const io = new Socket(httpServer)
+
+const productosDB = new ContenedorDB(configMySQL.config,configMySQL.table)
+const mensajesDB = new ContenedorDB(configSGLite.config, configSGLite.table)
+
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
+
 
 io.on('connection', function(socket) {
     console.log('Un cliente se ha conectado');
-    socket.emit('messages', messages); // emitir todos los mensajes a un cliente nuevo 
-
-    socket.on('new-message', function(data) {
-        messages.push(data); // agregar mensajes a array 
-        io.sockets.emit('messages', messages); //emitir a todos los clientes
+    
+    /* productos */
+    
+    socket.emit('productos',productosDB.getAll());
+    
+    socket.on('update', producto=>{
+        productosDB.putItem(producto)
+        io.socket.emit('productos', productosDB.getAll())
+        console.log(producto)
+    })
+    
+    
+    /* mensajes */    
+    socket.emit('mensajes', mensajesDB); 
+    
+    socket.on('newMensajes', function(data) {
+        mensajesDB.push(data); 
+        io.sockets.emit('mensajes', mensajesDB); 
     });    
 });
 
-app.get('/ruta1', function(req, res) {
-    res.send('Hola Mundo')
-})
+
+
 
 const PORT = process.env.PORT || 8080;
 
-const srv = server.listen(PORT, () => { 
+const srv = httpServer.listen(PORT, () => { 
     console.log(`Servidor Http con Websockets escuchando en el puerto ${srv.address().port}`);
 })
 srv.on('error', error => console.log(`Error en servidor ${error}`))
