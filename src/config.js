@@ -7,7 +7,7 @@ const configMySQL ={
           port:3306,
           user: 'root',
           password: '',
-          database: 'ecommerce'
+          database: 'mibase'
         } 
     }
 }

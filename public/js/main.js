@@ -4,10 +4,14 @@ let socket = io.connect();
 const formAddProducto = document.getElementById('formAddProducto')
 formAddProducto.addEventListener('submit', e=>{
   e.preventDefault()
+  const name= document.getElementById('name')
+  const price= document.getElementById('price')
+  const picture= document.getElementById('picture')
+
   const producto = {
-    name:formAddProducto[0].value,
-    price:formAddProducto[1].value,
-    picture:formAddProducto[2].value,
+    name:name.value,
+    price:price.value,
+    picture:picture.value,
   }
   socket.emit('update',producto);
   formAddProducto.reset()
@@ -30,10 +34,9 @@ function makeHtmlTable(productos){
 }
 //-----------------------------------------------------------------------------------------
 
-const inputUsername = document.getElementById('username')
-const inputMensaje = document.getElementById('texto')
+const inputUsername = document.getElementById('inputUsername')
+const inputMensaje = document.getElementById('inputMensaje')
 const btnEnviar = document.getElementById('btnEnviar')
-
 const mensajesForm = document.getElementById('mensajesForm')
 
 mensajesForm.addEventListener('submit', e=>{
@@ -43,37 +46,39 @@ mensajesForm.addEventListener('submit', e=>{
     autor:inputUsername.value,
     texto:inputMensaje.value
   }
+  console.log(mensaje)
   
   socket.emit('newMensaje',mensaje)
   mensajesForm.reset()
   inputMensaje.focus()
 })
-console.log(mensaje)
 
-socket.on('mensajes', mensajes=>{
-  const html = makeHtmlList(mensajes)
+socket.on('mensajes',mensajes=>{
+  console.log(mensajes)
+  const html=htmlMensajesList(mensajes)
   document.getElementById('mensajes').innerHTML=html
-});
+})
 
-function makeHtmlList(mensajes){
-  return mensajes.map(mensaje=>{
-    return(` 
-        <div>
-            <span> ${mensaje.autor} </span>
-            <p> ${mensaje.texto} </p>
-        </div>
+function htmlMensajesList (mensajes){  
+  return mensajes.map(mensaje => {    
+    return (` 
+    <div>
+    <b> ${mensaje.username} </b>
+    <i> ${mensaje.texto} </i>
+    </div>
     `)
   }).join(" ")
 }
 
-inputUsername.addEventListener('input', ()=>{
+
+inputUsername.addEventListener('input',()=>{
   const user= inputUsername.value.length
   const texto = inputMensaje.value.length
   inputMensaje.disabled = !user
   btnEnviar.disabled = !user || !texto
 })
 
-inputmensaje.addEventListener('input', ()=>{
+inputMensaje.addEventListener('input', ()=>{
     const texto = inputMensaje.value.length  
-  btnEnviar.disabled = !user || !texto
+  btnEnviar.disabled = !texto
 })

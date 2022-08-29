@@ -9,7 +9,7 @@ class ContenedorDB{
 
     async getAll() {
        try {
-            return await this.knex.select().from(this.tabla)        
+            return await this.knex.select("*").from(this.tabla)        
        } catch (error) {
         throw new Error(`Error al lista ${error}`)
        }

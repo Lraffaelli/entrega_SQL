@@ -1,5 +1,4 @@
 const express = require('express')
-
 const app = express()
 
 const {Server:HttpServer} = require('http')
@@ -9,7 +8,7 @@ const ContenedorDB = require('./src/contenedores/ContenedorDB')
 const {configMySQL , configSGLite}= require('./src/config')
 
 
-
+let mensajes=[]
 
 //instalacion server socket y db
 
@@ -25,28 +24,32 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
 
 
-io.on('connection', function(socket) {
+io.on('connection',async socket=> {
     console.log('Un cliente se ha conectado');
     
     /* productos */
     
-    socket.emit('productos',productosDB.getAll());
+    socket.emit('productos', await productosDB.getAll());
     
-    socket.on('update', producto=>{
-        productosDB.putItem(producto)
-        io.socket.emit('productos', productosDB.getAll())
+    socket.on('update',async producto =>{
         console.log(producto)
+         productosDB.addItem(producto)
+        //io.socket.emit('productos',await productosDB.getAll())
+        
     })
     
     
-    /* mensajes */    
-    socket.emit('mensajes', mensajesDB); 
+    /* mensajes */  
+  
+    socket.emit('mensajes', mensajes); 
     
     socket.on('newMensajes', function(data) {
+        console.log(data)
         mensajesDB.push(data); 
         io.sockets.emit('mensajes', mensajesDB); 
-    });    
-});
+    });
+});     
+
 
 
 
