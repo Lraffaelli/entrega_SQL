@@ -34,38 +34,36 @@ function makeHtmlTable(productos){
 }
 //-----------------------------------------------------------------------------------------
 
-const inputUsername = document.getElementById('inputUsername')
-const inputMensaje = document.getElementById('inputMensaje')
+const inputUsername = document.getElementById('username')
+const inputMensaje = document.getElementById('texto')
 const btnEnviar = document.getElementById('btnEnviar')
 const mensajesForm = document.getElementById('mensajesForm')
 
 mensajesForm.addEventListener('submit', e=>{
   e.preventDefault()
 
-  const mensaje = {
-    autor:inputUsername.value,
-    texto:inputMensaje.value
-  }
+  const mensaje = {autor:inputUsername.value, texto:inputMensaje.value }
   console.log(mensaje)
   
-  socket.emit('newMensaje',mensaje)
+  socket.emit('nuevoMensaje',mensaje)
   mensajesForm.reset()
   inputMensaje.focus()
 })
 
-socket.on('mensajes',mensajes=>{
+socket.on('nuevoMensaje',mensajes=>{
   console.log(mensajes)
   const html=htmlMensajesList(mensajes)
-  document.getElementById('mensajes').innerHTML=html
+  document.getElementById('mensajes').innerHTML = html
 })
 
 function htmlMensajesList (mensajes){  
   return mensajes.map(mensaje => {    
     return (` 
-    <div>
-    <b> ${mensaje.username} </b>
-    <i> ${mensaje.texto} </i>
-    </div>
+        <div>
+        <b> ${mensaje.autor} </b>
+        [<span>${mensaje.fyh}</span>] :
+        <i> ${mensaje.texto} </i>
+        </div>
     `)
   }).join(" ")
 }

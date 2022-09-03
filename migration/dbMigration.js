@@ -14,7 +14,28 @@ try {
 
     await clientDB.destroy()
 
-    console.log('Se creo la tabla')
+    console.log('Se creo la tabla de productos')
 } catch (error) {
     
 }
+try {
+    const clientDB= knex(configSGLite.config)
+    await clientDB.schema.dropTableIfExist(configSGLite.table)
+
+    await clientDB.schema.createTable(configSGLite.table, table=>{
+        table.increment('id').primary(),
+        table.string('autor'),
+        table.string('texto'),
+        table.string('fyh')
+    })
+
+    await clientDB.destroy()
+
+    console.log('Se creo la tabla de mensajes')
+
+} catch (error) {
+    console.log('Error al crear tabla de mensajes')
+    console.log(error)
+}
+
+module.exports= migration

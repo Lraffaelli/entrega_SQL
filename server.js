@@ -17,7 +17,7 @@ const httpServer= new HttpServer(app)
 const io = new Socket(httpServer)
 
 const productosDB = new ContenedorDB(configMySQL.config,configMySQL.table)
-const mensajesDB = new ContenedorDB(configSGLite.config, configSGLite.table)
+const mensajesDB = new ContenedorDB(configSGLite.config,configSGLite.table)
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -32,21 +32,22 @@ io.on('connection',async socket=> {
     socket.emit('productos', await productosDB.getAll());
     
     socket.on('update',async producto =>{
-        console.log(producto)
+        
          productosDB.addItem(producto)
-        //io.socket.emit('productos',await productosDB.getAll())
+        io.sockets.emit('productos',await productosDB.getAll())
         
     })
     
     
     /* mensajes */  
   
-    socket.emit('mensajes', mensajes); 
-    
-    socket.on('newMensajes', function(data) {
-        console.log(data)
-        mensajesDB.push(data); 
-        io.sockets.emit('mensajes', mensajesDB); 
+    socket.emit('mensajes',await mensajesDB.getAll());
+   
+    socket.on('mensajes', async mensaje=> {
+       
+        mensaje.fyh = new Date().toLocaleDateString()
+        await mensajesDB.push(mensaje); 
+        io.sockets.emit('mensajes', await mensajesDB.getAll()); 
     });
 });     
 

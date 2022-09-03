@@ -1,5 +1,6 @@
 const configMySQL ={
     table:'productos',
+    table2:'mensajes',
     config: {
         client: 'mysql',
         connection: {
@@ -17,7 +18,7 @@ const configSGLite ={
     config:{
         client: 'sqlite3', 
         connection: {
-          filename: "./DB/mensajes.sqlite"
+          filename: './DB/mensajes.sqlite'
         },
         useNullAsDefault:true
       }
